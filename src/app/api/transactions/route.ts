@@ -105,12 +105,18 @@ export async function POST(req: NextRequest) {
     }
     const changeAmount = paidAmount - total
 
-    // Buat kode unik
-    let code = makeTrxCode()
-    for (let i = 0; i < 5; i++) {
+    // Buat kode nota unik: MEL{nomor urut}-{DDMMYYYY}-{3 huruf depan nama produk pertama}
+    // Contoh: MEL01-01012027-BAN. Nomor urut = jumlah transaksi + 1; kalau kode
+    // kebetulan sudah dipakai (mis. ada transaksi yang dihapus), nomor naik terus.
+    const firstName = itemData[0]?.name
+    const trxCount = await db.transaction.count()
+    let code = ""
+    let seq = trxCount + 1
+    for (let i = 0; i < 50; i++) {
+      code = makeTrxCode(seq, firstName)
       const exists = await db.transaction.findUnique({ where: { code } })
       if (!exists) break
-      code = makeTrxCode()
+      seq++
     }
 
     const transaction = await db.$transaction(async (tx) => {
