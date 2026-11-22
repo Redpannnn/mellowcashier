@@ -4,6 +4,7 @@ import { useMemo, useState } from "react"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { Search, ShoppingCart } from "lucide-react"
 import { toast } from "sonner"
+import { safeJson } from "@/lib/api"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -34,7 +35,7 @@ export function CashierView() {
     queryFn: async () => {
       const res = await fetch("/api/products")
       if (!res.ok) throw new Error("Gagal memuat produk")
-      return res.json()
+      return safeJson<{ products: Product[] }>(res)
     },
   })
 
