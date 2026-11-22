@@ -12,6 +12,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
     const name = typeof body.name === "string" ? body.name.trim() : undefined
     const price = body.price === undefined ? undefined : Number(body.price)
+    const costPrice = body.costPrice === undefined ? undefined : Number(body.costPrice)
     const image = typeof body.image === "string" ? body.image : undefined
     const stock = body.stock === undefined ? undefined : Number(body.stock)
 
@@ -20,6 +21,9 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     }
     if (price !== undefined && (!Number.isFinite(price) || price < 0)) {
       return NextResponse.json({ error: "Harga tidak valid" }, { status: 400 })
+    }
+    if (costPrice !== undefined && (!Number.isFinite(costPrice) || costPrice < 0)) {
+      return NextResponse.json({ error: "Harga beli tidak valid" }, { status: 400 })
     }
     if (stock !== undefined && (!Number.isInteger(stock) || stock < 0)) {
       return NextResponse.json({ error: "Stok tidak valid" }, { status: 400 })
@@ -30,6 +34,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       data: {
         ...(name !== undefined && { name }),
         ...(price !== undefined && { price: Math.round(price) }),
+        ...(costPrice !== undefined && { costPrice: Math.round(costPrice) }),
         ...(image !== undefined && { image }),
         ...(stock !== undefined && { stock }),
       },
