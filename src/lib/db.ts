@@ -13,8 +13,16 @@ import { createClient } from '@libsql/client'
  * Tabel dibuat otomatis saat request pertama (tidak perlu jalankan command apa pun).
  */
 
-const tursoUrl = process.env.TURSO_DATABASE_URL
-const tursoToken = process.env.TURSO_AUTH_TOKEN || process.env.DATABASE_AUTH_TOKEN
+/** Bersihin nilai env: buang spasi & tanda kutip yang sering kebawa pas paste di dashboard */
+function cleanEnv(value: string | undefined): string | undefined {
+  const v = value?.trim().replace(/^["']|["']$/g, "")
+  return v ? v : undefined
+}
+
+const tursoUrl = cleanEnv(process.env.TURSO_DATABASE_URL)
+const tursoToken = cleanEnv(
+  process.env.TURSO_AUTH_TOKEN || process.env.DATABASE_AUTH_TOKEN
+)
 
 function createDb(): PrismaClient {
   if (tursoUrl) {
