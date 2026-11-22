@@ -39,7 +39,7 @@ export function TopNav({ active, onChange }: { active: TabKey; onChange: (t: Tab
           <img
             src="/logo.png"
             alt="MELLOW"
-            className="h-12 w-auto select-none object-contain dark:invert"
+            className="h-10 w-auto select-none object-contain dark:invert"
           />
         </div>
 
