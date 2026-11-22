@@ -19,6 +19,7 @@ import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { formatDateTimeWIB, formatIDR } from "@/lib/format"
+import { safeJson } from "@/lib/api"
 import type { Trx } from "@/lib/types"
 import { cn } from "@/lib/utils"
 import { NotaDialog } from "./nota-dialog"
@@ -55,7 +56,7 @@ export function TransactionsView() {
           : `mode=month&month=${month}`
       const res = await fetch(`/api/transactions?${params}`)
       if (!res.ok) throw new Error("Gagal memuat transaksi")
-      return res.json()
+      return safeJson<{ transactions: Trx[]; totalSales: number }>(res)
     },
     enabled: mode === "month" || rangeReady,
   })
