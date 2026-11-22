@@ -53,6 +53,7 @@ const SCHEMA_STATEMENTS = [
     "id" TEXT NOT NULL PRIMARY KEY,
     "name" TEXT NOT NULL,
     "price" INTEGER NOT NULL,
+    "costPrice" INTEGER NOT NULL DEFAULT 0,
     "image" TEXT NOT NULL DEFAULT '',
     "stock" INTEGER NOT NULL DEFAULT 0,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -88,6 +89,15 @@ const SCHEMA_STATEMENTS = [
   )`,
 ]
 
+/**
+ * Migrasi ringan untuk DB Turso yang SUDAH jalan sebelum kolom ini ada.
+ * SQLite/libSQL tidak punya ADD COLUMN IF NOT EXISTS, jadi error
+ * "duplicate column" diabaikan saja (artinya kolom sudah ada).
+ */
+const MIGRATION_STATEMENTS = [
+  `ALTER TABLE "Product" ADD COLUMN "costPrice" INTEGER NOT NULL DEFAULT 0`,
+]
+
 const globalForSchema = globalThis as unknown as {
   kasirkuSchemaReady: Promise<void> | undefined
 }
@@ -103,6 +113,13 @@ export function dbReady(): Promise<void> {
       })
       for (const stmt of SCHEMA_STATEMENTS) {
         await client.execute(stmt)
+      }
+      for (const stmt of MIGRATION_STATEMENTS) {
+        try {
+          await client.execute(stmt)
+        } catch (err) {
+          if (!/duplicate column|already exists/i.test(String(err))) throw err
+        }
       }
       client.close()
     })().catch((err) => {
