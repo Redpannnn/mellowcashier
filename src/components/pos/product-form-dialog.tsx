@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react"
 import { ImageIcon, Loader2, Pencil, Upload, X } from "lucide-react"
 import { toast } from "sonner"
+import { safeJson } from "@/lib/api"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -125,7 +126,7 @@ export function ProductFormDialog({
             : { name: name.trim(), price, costPrice, image, stock }
         ),
       })
-      const data = await res.json()
+      const data = await safeJson<{ product?: Product; error?: string }>(res)
       if (!res.ok) throw new Error(data.error || "Gagal menyimpan produk")
       toast.success(isEdit ? "Produk berhasil diubah" : "Produk berhasil ditambah")
       onSuccess()
