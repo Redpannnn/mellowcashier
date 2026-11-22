@@ -59,6 +59,7 @@ export function ProductFormDialog({
   const isEdit = Boolean(product)
   const [name, setName] = useState("")
   const [priceInput, setPriceInput] = useState("")
+  const [costInput, setCostInput] = useState("")
   const [stockInput, setStockInput] = useState("")
   const [image, setImage] = useState("")
   const [uploading, setUploading] = useState(false)
@@ -69,6 +70,7 @@ export function ProductFormDialog({
     if (open) {
       setName(product?.name ?? "")
       setPriceInput(product ? product.price.toLocaleString("id-ID") : "")
+      setCostInput(product && product.costPrice > 0 ? product.costPrice.toLocaleString("id-ID") : "")
       setStockInput("")
       setImage(product?.image ?? "")
       setUploading(false)
@@ -97,12 +99,17 @@ export function ProductFormDialog({
 
   async function save() {
     const price = parseNumberID(priceInput)
+    const costPrice = parseNumberID(costInput)
     if (!name.trim()) {
       toast.error("Nama produk wajib diisi")
       return
     }
     if (price <= 0) {
       toast.error("Harga harus lebih dari 0")
+      return
+    }
+    if (costPrice < 0) {
+      toast.error("Harga beli tidak valid")
       return
     }
     const stock = parseNumberID(stockInput)
@@ -114,8 +121,8 @@ export function ProductFormDialog({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(
           isEdit
-            ? { name: name.trim(), price, image }
-            : { name: name.trim(), price, image, stock }
+            ? { name: name.trim(), price, costPrice, image }
+            : { name: name.trim(), price, costPrice, image, stock }
         ),
       })
       const data = await res.json()
@@ -218,6 +225,21 @@ export function ProductFormDialog({
             />
             {priceInput && (
               <p className="text-xs text-muted-foreground">{formatIDR(parseNumberID(priceInput))}</p>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="pf-harga-beli">Harga beli awal</Label>
+            <Input
+              id="pf-harga-beli"
+              inputMode="numeric"
+              value={costInput}
+              onChange={(e) => setCostInput(formatThousandInput(e.target.value))}
+              placeholder="0"
+              className="h-11"
+            />
+            {costInput && (
+              <p className="text-xs text-muted-foreground">{formatIDR(parseNumberID(costInput))}</p>
             )}
           </div>
 
