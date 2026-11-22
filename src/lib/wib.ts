@@ -42,10 +42,21 @@ export function wibCurrentMonthStr(): string {
   return wibTodayStr().slice(0, 7)
 }
 
-/** Generate unique transaction code e.g. TRX-20250108-AB3F */
-export function makeTrxCode(): string {
+/** Generate kode nota, contoh: MEL01-01012027-BAN
+ *  MEL      = prefix brand MELLOW
+ *  01       = nomor urut nota (makin banyak nota, angkanya makin gede)
+ *  01012027 = tanggal nota DDMMYYYY (waktu WIB)
+ *  BAN      = 3 huruf depan nama produk pertama di pesanan
+ *             (huruf/angka aja; kalau kosong dipakai XXX) */
+export function makeTrxCode(seq: number, productName?: string): string {
   const now = new Date(Date.now() + WIB_OFFSET_MS)
-  const ymd = now.toISOString().slice(0, 10).replace(/-/g, "")
-  const rand = Math.random().toString(36).slice(2, 6).toUpperCase()
-  return `TRX-${ymd}-${rand}`
+  const iso = now.toISOString().slice(0, 10) // YYYY-MM-DD
+  const [y, m, d] = iso.split("-")
+  const seqStr = String(Math.max(1, seq)).padStart(2, "0")
+  const productPart =
+    (productName ?? "")
+      .toUpperCase()
+      .replace(/[^A-Z0-9]/g, "")
+      .slice(0, 3) || "XXX"
+  return `MEL${seqStr}-${d}${m}${y}-${productPart}`
 }
