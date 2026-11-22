@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { formatDateWIB, formatIDR, formatTimeWIB } from "@/lib/format"
+import { safeJson } from "@/lib/api"
 import type { ReportData } from "@/lib/types"
 import { cn } from "@/lib/utils"
 
@@ -81,7 +82,7 @@ export function ReportsView() {
           : `period=${period}&date=${date}`
       const res = await fetch(`/api/reports?${params}`)
       if (!res.ok) throw new Error("Gagal memuat laporan")
-      return res.json()
+      return safeJson<ReportData>(res)
     },
   })
 
