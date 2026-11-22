@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { Loader2, PackagePlus } from "lucide-react"
 import { toast } from "sonner"
+import { safeJson } from "@/lib/api"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -57,7 +58,7 @@ export function RestockDialog({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ quantity: qty, cost }),
       })
-      const data = await res.json()
+      const data = await safeJson<{ error?: string }>(res)
       if (!res.ok) throw new Error(data.error || "Gagal menambah stok")
       toast.success(
         `Stok "${product.name}" bertambah ${qty} pcs${cost > 0 ? ` (belanja ${formatIDR(cost)} tercatat)` : ""}`
