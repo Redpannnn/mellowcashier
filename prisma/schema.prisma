@@ -12,6 +12,7 @@ model Product {
   id        String            @id @default(cuid())
   name      String
   price     Int
+  costPrice Int               @default(0)
   image     String            @default("")
   stock     Int               @default(0)
   createdAt DateTime          @default(now())
