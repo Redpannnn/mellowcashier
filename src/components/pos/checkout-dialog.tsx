@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { Banknote, Loader2, QrCode, Wallet, Check } from "lucide-react"
 import { toast } from "sonner"
+import { safeJson } from "@/lib/api"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -62,7 +63,7 @@ export function CheckoutDialog({
           paidAmount: paid,
         }),
       })
-      const data = await res.json()
+      const data = await safeJson<{ transaction?: Trx; error?: string }>(res)
       if (!res.ok) {
         throw new Error(data.error || "Gagal memproses pembayaran")
       }
