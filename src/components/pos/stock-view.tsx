@@ -13,6 +13,7 @@ import {
   Trash2,
 } from "lucide-react"
 import { toast } from "sonner"
+import { safeJson } from "@/lib/api"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -41,7 +42,7 @@ export function StockView() {
     queryFn: async () => {
       const res = await fetch("/api/products")
       if (!res.ok) throw new Error("Gagal memuat produk")
-      return res.json()
+      return safeJson<{ products: Product[] }>(res)
     },
   })
 
@@ -71,7 +72,7 @@ export function StockView() {
     setDeleting(true)
     try {
       const res = await fetch(`/api/products/${deleteTarget.id}`, { method: "DELETE" })
-      const data = await res.json()
+      const data = await safeJson<{ ok?: boolean; error?: string }>(res)
       if (!res.ok) throw new Error(data.error || "Gagal menghapus produk")
       toast.success(`Produk "${deleteTarget.name}" dihapus`)
       refresh()
